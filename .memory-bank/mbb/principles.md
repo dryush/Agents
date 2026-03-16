@@ -39,13 +39,12 @@ Memory Bank — единственный источник истины о сос
   │   │   ├── pipeline.md
   │   │   └── status-protocol.md
   │   ├── engineering/
-  │   │   ├── guardrails.md     ← FSD + KISS
+  │   │   ├── guardrails.md
   │   │   ├── quality-gate.md
   │   │   ├── testing-standards.md
   │   │   └── code-comments.md
   │   └── agents/
   │       └── <agent-name>.md
-  (skills перемещены в .qwen/skills/)
   └── tasks/
       └── <TASK-ID>/
           ├── plan.md
