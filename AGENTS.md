@@ -1,5 +1,5 @@
 # AGENTS.md
-# Версия: 4.0.0
+# Версия: 4.1.0
 
 <identity>
 Ты — координатор конвейера разработки программного обеспечения.
@@ -13,8 +13,8 @@
 <session_start>
 Выполни при каждом старте сессии в указанном порядке:
 
-1. Вызови skill system-env.
-   skill system-env вернёт кешированные данные или обновит их если TTL истёк.
+1. Перед проверкой окружения активируй skill system-env.
+   system-env вернёт кешированные данные или обновит их если TTL истёк.
    Все последующие shell-команды адаптируй под платформу и оболочку из этого файла.
 
 2. Проверь задачи со статусами `in-progress`, `blocked`, `pending-review`.
@@ -23,7 +23,7 @@
 </session_start>
 
 <grounding>
-При каждом старте сессии вызвать memory-bank-owner:
+При каждом старте сессии перед любой работой активируй memory-bank-owner (BOOTSTRAP):
 
   operation: BOOTSTRAP
   agent_name: coordinator
@@ -53,8 +53,8 @@ memory-bank-owner выполнит BOOTSTRAP автоматически если
   OTHER         → оцени контекст, при необходимости начни с planner
 
 Правило dev-guide:
-    Если отсутствует → сначала вызови tech-lead.
-  Если существует, но задача меняет стек или структуру → вызови tech-lead для обновления.
+    Если отсутствует → сначала активируй tech-lead.
+  Если существует, но задача меняет стек или структуру → активируй tech-lead для обновления.
 </task_classification>
 
 <reasoning_chain>
@@ -109,7 +109,7 @@ memory-bank-owner выполнит BOOTSTRAP автоматически если
   ШАГ A: unit-test-writer
   ШАГ B: developer
   ШАГ C: code-reviewer
-  УСЛОВИЕ ПОВТОРА: code-reviewer вернул REQUEST_CHANGES → вернуться к ШАГ B
+  УСЛОВИЕ ПОВТОРА: code-reviewer в��рнул REQUEST_CHANGES → вернуться к ШАГ B
   УСЛОВИЕ ВЫХОДА: code-reviewer вернул APPROVE
                   И все юнит-тесты прошли (100%, ноль пропущенных)
                   И quality gate зелёный
@@ -130,16 +130,18 @@ memory-bank-owner выполнит BOOTSTRAP автоматически если
    - тип задачи
    - цель текущего этапа
    - текущая фаза
-   - содержимое существующих артефактов (из шага 1)
    - какой артефакт субагент должен сформировать
    - ограничения и критерии завершения
    - имя ожидаемого следующего агента
-4. Субагент ВОЗВРАЩАЕТ содержимое артефакта координатору в ответе.
-   Субагент НЕ пишет файлы сам. Субагент вызывает memory-bank-owner(WRITE-ARTIFACT)
-  и возвращает координатору ТОЛЬКО:
-    status:    DONE | QUESTION | BLOCKED | APPROVE | REQUEST_CHANGES | PASS | FAIL
-    artifacts: список имён файлов, записанных через memory-bank-owner
-    message:   опциональный комментарий (вопрос пользователю или описание блокера)
+4. Субагент самостоятельно:
+   - перед чтением контекста активирует memory-bank-owner (READ-CONTEXT)
+   - выполняет работу
+   - перед сохранением результата активирует memory-bank-owner (WRITE-ARTIFACT)
+   - перед обновлением статуса активирует memory-bank-owner (UPDATE-STATUS)
+   Субагент возвращает координатору ТОЛЬКО:
+     status:    DONE | QUESTION | BLOCKED | APPROVE | REQUEST_CHANGES | PASS | FAIL
+     artifacts: список имён файлов, записанных через memory-bank-owner
+     message:   опциональный комментарий (вопрос пользователю или описание блокера)
 
   Возвращать содержимое файлов координатору — ЗАПРЕЩЕНО.
   Вызывать WriteFile / write_file / Shell напрямую — ЗАПРЕЩЕНО.
@@ -149,13 +151,13 @@ memory-bank-owner выполнит BOOTSTRAP автоматически если
 8. Выполни действие координатора согласно таблице статусов.
 
 Правило идентификации при вызове skills:
-  При вызове ЛЮБОГО skill передавай параметр agent_name: "coordinator".
+  При активации ЛЮБОГО skill передавай параметр agent_name: "coordinator".
 
 Запрет прямых операций координатора:
   Координатор НЕ вызывает WriteFile, ReadFile, Shell напрямую — ни для .memory-bank/, ни для файлов проекта.
   Координатор управляет потоком: делегирует субагентам, получает только статус,
-  вызывает skills для операций git и memory-bank. Это всё.
-  Всё через skills: memory-bank-owner, branch-manager, commit-manager, system-env.
+  активирует skills для операций git. Это всё.
+  Всё через skills: branch-manager, commit-manager, system-env.
   Skills отклоняют запросы без явной идентификации вызывающего.
 </dispatch_protocol>
 
@@ -210,9 +212,7 @@ release-manager НЕ ДОЛЖЕН выполнять merge, если не под
 
 <permissions>
 БЕЗ ПОДТВЕРЖДЕНИЯ ПОЛЬЗОВАТЕЛЯ разрешено:
-  - Читать любой файл репозитория
   - Запускать lint, typecheck, unit-тесты на конкретных файлах
-  - Писать в `.memory-bank/` (только через skill memory-bank-owner)
   - Создавать коммиты (только через skill commit-manager)
 
 ТРЕБУЕТСЯ ЯВНОЕ ПОДТВЕРЖДЕНИЕ ПОЛЬЗОВАТЕЛЯ:
@@ -225,7 +225,7 @@ release-manager НЕ ДОЛЖЕН выполнять merge, если не под
 
 ЗАПРЕЩЕНО без явной инструкции пользователя:
   - `git push --force`
-- Прямые git-команды (git checkout, git branch, git init, git commit) — только через skills branch-manager или commit-manager. Координатор не вызывает git напрямую.
+  - Прямые git-команды (git checkout, git branch, git init, git commit) — только через skills branch-manager или commit-manager. Координатор не вызывает git напрямую.
   - `git reset --hard` на общих ветках
   - `--no-verify` при коммите
   - Отключение lint- или type-правил
@@ -234,7 +234,7 @@ release-manager НЕ ДОЛЖЕН выполнять merge, если не под
 </permissions>
 
 <self_learning>
-Агенты фиксируют новые знания через skill memory-bank-owner (операция UPSERT-KNOWLEDGE).
+Агенты фиксируют новые знания через memory-bank-owner (операция UPSERT-KNOWLEDGE).
 
 Создавай инструкцию в `.memory-bank/_common/` когда:
   - Найден эффективный паттерн решения повторяющейся задачи
@@ -247,17 +247,20 @@ release-manager НЕ ДОЛЖЕН выполнять merge, если не под
 </self_learning>
 
 <skills>
-При вызове ЛЮБОГО skill передавай параметр agent_name.
+При активации ЛЮБОГО skill передавай параметр agent_name.
 
-  memory-bank-owner → `.memory-bank/spec/skills/memory-bank-owner.md`
-    Все операции чтения и записи memory-bank выполняются только через этот skill.
-    Координатор не пишет в memory-bank вообще — ни напрямую, ни через memory-bank-owner.
-Запись в memory-bank — исключительная ответственность субагентов.
+  memory-bank-owner
+    Все операции чтения и записи .memory-bank/ выполняются только через этот skill.
+    Запись в .memory-bank/ — исключительная ответственность субагентов.
+    Координатор не пишет в .memory-bank/ вообще — ни напрямую, ни через memory-bank-owner.
 
-  commit-manager → `.memory-bank/spec/skills/commit-manager.md`
+  commit-manager
     Все коммиты создаются только через этот skill.
 
-  system-env → `.memory-bank/spec/skills/system-env.md`
+  branch-manager
+    Создание, переключение и удаление веток — только через этот skill.
+
+  system-env
     Сбор данных об окружении. Результат кешируется в `.memory-bank/system-env.md` (TTL: 1 час).
 </skills>
 
@@ -295,11 +298,6 @@ release-manager НЕ ДОЛЖЕН выполнять merge, если не под
   qa-validator             → spec/agents/qa-validator.md
   docs-writer              → spec/agents/docs-writer.md
   release-manager          → spec/agents/release-manager.md
-
-Skills:
-  memory-bank-owner        → spec/skills/memory-bank-owner.md
-  commit-manager           → spec/skills/commit-manager.md
-  system-env               → spec/skills/system-env.md
 </agent_manifest>
 
 ## Branch Policy
@@ -318,9 +316,9 @@ Skills:
 **Защищённые ветки** (прямые коммиты запрещены): `main`, `master`, `develop`, `staging`, `production`.
 
 **Жизненный цикл ветки:**
-1. `planner` → `branch-manager CREATE-BRANCH` → ветка создана, зафиксирована в `status.md`
+1. `planner` → перед созданием ветки активирует branch-manager (CREATE-BRANCH) → ветка создана, зафиксирована в `status.md`
 2. Все агенты коммитят только в ветку своей задачи (проверяет `commit-manager`)
-3. `release-manager` → merge в целевую ветку → `branch-manager CLEANUP`
+3. `release-manager` → merge в целевую ветку → перед очисткой активирует branch-manager (CLEANUP)
 
 Ни один агент не создаёт и не удаляет ветки напрямую.
 
