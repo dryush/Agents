@@ -39,130 +39,33 @@ BOOTSTRAP выполняется АВТОМАТИЧЕСКИ при любой о
 ШАГ 1 — Создать скелет директорий:
   .memory-bank/
   .memory-bank/mbb/
+  .memory-bank/adr/
   .memory-bank/_common/
   .memory-bank/spec/
   .memory-bank/spec/process/
-  .memory-bank/spec/skills/
   .memory-bank/spec/engineering/
   .memory-bank/spec/agents/
   .memory-bank/tasks/
 
-ШАГ 2 — Создать обязательные файлы (шаблоны ниже):
-  .memory-bank/index.md
-  .memory-bank/mbb/principles.md
-  .memory-bank/system-env.md
-  .memory-bank/_common/index.md
-  .memory-bank/_common/README.md
+ШАГ 2 — Создать обязательные файлы из шаблонов:
+  Источник шаблонов: .qwen/skills/memory-bank-owner/templates/
 
-ШАГ 3 — Скопировать spec-файлы из .qwen/skills/ и .qwen/agents/ в .memory-bank/spec/:
-  Если .qwen/ существует:
-    .qwen/skills/memory-bank-owner/SKILL.md  → .memory-bank/spec/skills/memory-bank-owner.md
-    .qwen/skills/commit-manager/SKILL.md     → .memory-bank/spec/skills/commit-manager.md
-    .qwen/skills/system-env/SKILL.md         → .memory-bank/spec/skills/system-env.md
-    .qwen/agents/*.md                        → .memory-bank/spec/agents/*.md
-  Если .qwen/ не существует: пропустить ШАГ 3, зафиксировать в BOOTSTRAP-report.
+  templates/index.md          → .memory-bank/index.md
+  templates/principles.md     → .memory-bank/mbb/principles.md
+  templates/system-env.md     → .memory-bank/system-env.md
+  templates/_common-index.md  → .memory-bank/_common/index.md
+  templates/_common-README.md → .memory-bank/_common/README.md
+  templates/adr-index.md      → .memory-bank/adr/index.md
 
-ШАГ 4 — Вызвать skill system-env (operation: BOOTSTRAP, force: true)
+ШАГ 3 — Скопировать инструкции агентов:
+  Если .qwen/agents/ существует:
+    .qwen/agents/*.md → .memory-bank/spec/agents/*.md
+  Если .qwen/agents/ не существует: пропустить, зафиксировать в BOOTSTRAP-report.
+
+ШАГ 4 — Активировать skill system-env (operation: BOOTSTRAP, force: true)
   Записать результат в .memory-bank/system-env.md
 
-ШАГ 5 — Вернуть BOOTSTRAP-report координатору (шаблон ниже).
-
-## Шаблоны файлов для ШАГ 2
-
-### .memory-bank/index.md
-```
----
-type: index
-version: 1.0.0
----
-# Memory Bank — Navigation Index
-
-## Core
-- [Principles](.memory-bank/mbb/principles.md)
-- [System Environment](.memory-bank/system-env.md)
-
-## Process
-- [Pipeline](.memory-bank/spec/process/pipeline.md)
-- [Status Protocol](.memory-bank/spec/process/status-protocol.md)
-
-## Skills
-- [memory-bank-owner](.memory-bank/spec/skills/memory-bank-owner.md)
-- [commit-manager](.memory-bank/spec/skills/commit-manager.md)
-- [system-env](.memory-bank/spec/skills/system-env.md)
-
-## Engineering Standards
-- [Quality Gate](.memory-bank/spec/engineering/quality-gate.md)
-- [Guardrails](.memory-bank/spec/engineering/guardrails.md)
-- [Testing Standards](.memory-bank/spec/engineering/testing-standards.md)
-
-## Agents
-- [planner](.memory-bank/spec/agents/planner.md)
-- [spec-writer](.memory-bank/spec/agents/spec-writer.md)
-- [architect](.memory-bank/spec/agents/architect.md)
-- [tech-lead](.memory-bank/spec/agents/tech-lead.md)
-- [unit-test-writer](.memory-bank/spec/agents/unit-test-writer.md)
-- [developer](.memory-bank/spec/agents/developer.md)
-- [code-reviewer](.memory-bank/spec/agents/code-reviewer.md)
-- [integration-test-writer](.memory-bank/spec/agents/integration-test-writer.md)
-- [qa-validator](.memory-bank/spec/agents/qa-validator.md)
-- [docs-writer](.memory-bank/spec/agents/docs-writer.md)
-- [release-manager](.memory-bank/spec/agents/release-manager.md)
-
-## Technology Guides
-- [Index](.memory-bank/_common/index.md)
-
-## Project Tasks
-<!-- Обновляется memory-bank-owner при создании новых задач -->
-```
-
-### .memory-bank/mbb/principles.md
-Содержимое: скопировать из .memory-bank/spec/skills/memory-bank-owner.md секцию <bootstrap> → шаблон principles.md (см. файл в архиве).
-Если файл недоступен: создать минимальный файл:
-```
----
-type: principles
-version: 1.0.0
----
-# Memory Bank Principles
-
-Любое знание, не зафиксированное в memory-bank, не существует для агентов.
-Запись — только через skill memory-bank-owner.
-Чтение — напрямую любым агентом.
-```
-
-### .memory-bank/system-env.md
-```
----
-type: system-env
-generated_by: skill/system-env
-generated_at: UNSET
-ttl_hours: 1
----
-# System Environment
-<!-- Заполняется skill system-env -->
-```
-
-### .memory-bank/_common/index.md
-```
----
-type: tech-guides-index
-version: 1.0.0
----
-# Technology Guides Index
-<!-- Гайды добавляются через UPSERT-KNOWLEDGE -->
-```
-
-### .memory-bank/_common/README.md
-```
----
-type: meta
----
-# Technology Guides — How to Add
-Операция: UPSERT-KNOWLEDGE через skill memory-bank-owner.
-path: .memory-bank/_common/<technology>/guide.md
-Структура гайда: Problem / Solution / Example / Enforcement
-После добавления — обновить _common/index.md через WRITE-ARTIFACT.
-```
+ШАГ 5 — Вернуть BOOTSTRAP-report (шаблон ниже).
 
 ## BOOTSTRAP-report шаблон
 
@@ -170,25 +73,25 @@ path: .memory-bank/_common/<technology>/guide.md
 BOOTSTRAP COMPLETE
   created_dirs:   <список созданных директорий>
   created_files:  <список созданных файлов>
-  spec_copied:    true | false
+  agents_copied:  true | false
   system_env:     populated | skipped
   warnings:       <список предупреждений или "none">
-next_step: <следующая операция, прерванная bootstrap-ом, или "ready">
+next_step: <следующая операция или "ready">
 ```
 
 ## Повторный BOOTSTRAP (repair)
 
 Если .memory-bank/ существует, но повреждён (отсутствуют обязательные файлы):
-  - Создать только недостающие файлы (не перезаписывать существующие).
+  - Создать только недостающие файлы из шаблонов (не перезаписывать существующие).
   - Зафиксировать восстановленные файлы в BOOTSTRAP-report.
-  - Признак повреждения: отсутствует index.md или mbb/principles.md.
+  - Признаки повреждения: отсутствует index.md или mbb/principles.md.
 
 </bootstrap>
 
 <operations>
 
 READ-CONTEXT
-  Назначение: получить артефакты задачи для передачи субагенту.
+  Назначение: получить артефакты задачи для субагента.
   Параметры:
     task_id:   идентификатор задачи
     files:     список имён файлов (или "all" для всех артефактов задачи)
@@ -196,7 +99,7 @@ READ-CONTEXT
   Если файл не существует: вернуть null для этого файла, не прерывать операцию.
 
 WRITE-ARTIFACT
-  Назначение: записать артефакт, возвращённый субагентом.
+  Назначение: записать артефакт субагента.
   Параметры:
     task_id:   идентификатор задачи
     filename:  имя файла (из списка допустимых артефактов)
@@ -204,7 +107,8 @@ WRITE-ARTIFACT
   Перед записью:
     1. Проверить существование .memory-bank/ → если нет, выполнить BOOTSTRAP.
     2. Проверить, что filename входит в допустимые артефакты (см. <artifacts>).
-    3. Если создаётся новая задача — зарегистрировать в index.md секция "Project Tasks".
+    3. Если создаётся новая задача — зарегистрировать в index.md (секция "Project Tasks").
+       Использовать шаблоны/status.md для первичного status.md задачи.
     4. Записать файл в .memory-bank/tasks/<task_id>/<filename>.
   После записи: подтвердить успех с путём файла.
 
@@ -234,77 +138,14 @@ UPSERT-KNOWLEDGE
   plan.md            — цель, скоуп, критерии успеха, декомпозиция
   status.md          — статус задачи, фаза, таблица прогресса
   spec.md            — user stories, acceptance criteria
-  architecture.md    — контракты, ADR, структура
-  dev-guide.md       — команды, conventions, стек
+  architecture.md    — контракты, tech decision matrix, конфигурационный contract, модель изоляции
+  dev-guide.md       — команды setup/run/test/build, conventions, примеры конфигурации
   review.md          — замечания code-reviewer
   qa-report.md       — отчёт qa-validator
+  adr-N.md           — task-level ADR (N = порядковый номер внутри задачи)
+
+Глобальные ADR пишутся напрямую в .memory-bank/adr/adr-NNN-<slug>.md
+и регистрируются в .memory-bank/adr/index.md.
 
 Файлы вне этого списка — только при allow_custom: true.
 </artifacts>
-
-<templates>
-
-plan.md:
-```
----
-task_id: <TASK-ID>
-type: <NEWPROJECT|MAJORCHANGE|FEATURE|BUG|TECHDEBT|DOCS>
-created_by: coordinator
----
-# Plan: <название>
-
-## Запрос пользователя
-<исходный текст>
-
-## Цель
-<одно предложение>
-
-## Скоуп
-### Включено
-- ...
-### Исключено
-- ...
-
-## Критерии успеха
-- [ ] ...
-
-## Декомпозиция
-- [ ] <этап>
-```
-
-status.md:
-```
----
-task_id: <TASK-ID>
-status: in-progress
-phase: planning
-last_agent: coordinator
-updated_at: <timestamp>
----
-# Status: <TASK-ID>
-
-## Прогресс по этапам
-
-| Этап | Агент | Статус | Артефакт |
-|------|-------|--------|----------|
-| 1. planner | planner | pending | plan.md |
-| 2. spec-writer | spec-writer | pending | spec.md |
-| 3. architect | architect | pending | architecture.md |
-| 4. tech-lead | tech-lead | — | dev-guide.md |
-| 5. unit-test-writer | unit-test-writer | pending | тесты |
-| 6. developer | developer | pending | реализация |
-| 7. code-reviewer | code-reviewer | pending | review.md |
-| 8. integration-test-writer | integration-test-writer | pending | тесты |
-| 9. code-reviewer | code-reviewer | pending | review.md |
-| 10. qa-validator | qa-validator | pending | qa-report.md |
-| 11. docs-writer | docs-writer | pending | документация |
-| 12. release-manager | release-manager | pending | — |
-
-## Блокеры
-- нет
-
-## История
-- <timestamp> coordinator: задача создана
-```
-
-</templates>
