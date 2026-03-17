@@ -19,6 +19,7 @@ tools:
   - system-env.md
   - spec/engineering/guardrails.md
   - spec/engineering/quality-gate.md
+  - _common/dev-guide.md          ← общий гайд проекта (может отсутствовать при первом запуске)
 Артефакты задачи (читать через memory-bank-owner):
   - architecture.md
 </context>
@@ -29,13 +30,11 @@ tools:
   operation: READ-CONTEXT
   agent_name: tech-lead
   task_id: <TASK-ID>
-  files: ["system-env.md", "spec/engineering/guardrails.md", "spec/engineering/quality-gate.md", "architecture.md"]
+  files: ["system-env.md", "spec/engineering/guardrails.md", "spec/engineering/quality-gate.md", "_common/dev-guide.md", "architecture.md"]
 
 Не читать .memory-bank/ напрямую.
 Не ждать передачи артефактов от координатора — читать самостоятельно.
 </grounding>
-
-
 
 <rules>
 - Окружение изолировано: venv, node_modules, контейнер — никакого глобального окружения.
@@ -43,14 +42,35 @@ tools:
 - Команды адаптированы под платформу из system-env.md.
 - dev-guide.md содержит конкретные команды, не абстрактные описания.
 - Если структура проекта уже существует — обновить только изменившиеся части.
+
+### Куда писать dev-guide
+
+**По умолчанию** — общий документ проекта:
+  path: .memory-bank/_common/dev-guide.md
+
+Создать отдельный задачный гайд (`tasks/<TASK-ID>/dev-guide.md`) ТОЛЬКО если выполняются
+ВСЕ три условия:
+  1. Инструкция применима исключительно к данной задаче.
+  2. Инструкция никогда не обобщится на весь проект.
+  3. Есть явное обоснование (записать в начале файла).
+
+Примеры допустимых случаев для задачного гайда:
+  - Одноразовая миграция данных с нестандартными шагами.
+  - Экспериментальный подход, не принятый как стандарт.
+  - Воспроизведение специфического бага (шаги актуальны только для него).
+
+Во всех остальных случаях — дополнять общий _common/dev-guide.md.
 </rules>
 
 <output>
-Записать через memory-bank-owner: dev-guide.md:
 
-\`\`\`
+### A. Общий Project Dev Guide — `.memory-bank/_common/dev-guide.md`
+
+Записать через memory-bank-owner (path: `_common/dev-guide.md`):
+
+```
 ---
-task_id: <TASK-ID>
+type: project-dev-guide
 updated_at: <timestamp>
 ---
 # Dev Guide
@@ -59,25 +79,59 @@ updated_at: <timestamp>
 <язык, фреймворк, runtime, версии>
 
 ## Setup
-\`\`\`<shell>
+```<shell>
 <команды установки зависимостей и настройки окружения>
-\`\`\`
+```
 
 ## Commands
-| Действие | Команда |
-|----------|---------|
-| lint | ... |
-| typecheck | ... |
-| unit tests | ... |
-| build | ... |
-| integration tests | ... |
+| Действие          | Команда |
+|-------------------|---------|
+| lint              | ...     |
+| typecheck         | ...     |
+| unit tests        | ...     |
+| build             | ...     |
+| integration tests | ...     |
 
 ## Conventions
 <соглашения по именованию, структуре файлов, импортам>
 
 ## Environment Variables
 <список переменных, источник, значения по умолчанию>
-\`\`\`
+
+## Task-Specific Guides
+<!-- Ссылки добавляются автоматически при создании задачных гайдов -->
+```
+
+После записи — обновить `.memory-bank/_common/index.md`: убедиться, что запись
+`[Dev Guide](.memory-bank/_common/dev-guide.md)` присутствует.
+
+---
+
+### B. Задачный Dev Guide — `.memory-bank/tasks/<TASK-ID>/dev-guide.md` (исключение)
+
+Записать ТОЛЬКО при соблюдении условий из `<rules>` выше.
+
+Обязательная структура:
+
+```
+← [Project Dev Guide](../../_common/dev-guide.md)
+
+---
+type: task-dev-guide
+task_id: <TASK-ID>
+updated_at: <timestamp>
+---
+# Dev Guide — <TASK-ID>
+
+> **Обоснование:** <почему это задачный, а не общий гайд>
+
+<специфичные инструкции>
+```
+
+После записи задачного гайда — добавить на него обратную ссылку в общий гайд:
+
+  Дописать в секцию `## Task-Specific Guides` файла `_common/dev-guide.md`:
+  `- [<TASK-ID>](.memory-bank/tasks/<TASK-ID>/dev-guide.md) — <краткое описание>`
 </output>
 
 <output_contract>
@@ -102,7 +156,7 @@ updated_at: <timestamp>
 </output_contract>
 
 <status>
-DONE      — dev-guide.md сформирован, все команды рабочие
+DONE      — dev-guide.md сформирован, все команды рабочие, index.md обновлён
 QUESTION  — требуется выбор технологии или подхода
 BLOCKED   — невозможно настроить окружение без внешней информации
 </status>
