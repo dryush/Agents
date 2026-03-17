@@ -1,6 +1,6 @@
 ---
 type: process
-version: 1.1.0
+version: 1.2.0
 ---
 # Status Protocol
 
@@ -23,6 +23,7 @@ version: 1.1.0
 | developer | DONE | BLOCKED | Вернуть к architect или spec-writer |
 | developer | DONE | PARTIAL | Зафиксировать частичный результат, запросить уточнение у пользователя |
 | developer | DONE | IMPL_BLOCKED | Передать unit-test-writer в режим IMPL_REVIEW (см. pipeline IMPL_BLOCKED) |
+| developer | DONE | ARCH_REVISION | Остановить TDD-цикл, зафиксировать arch-revision в status.md, вернуть к architect (ЭТАП 3) |
 | code-reviewer | APPROVE | REQUEST_CHANGES | Вернуть к developer с конкретным списком замечаний |
 | code-reviewer | APPROVE | BLOCKED | Восстановить недостающий артефакт, повторить ревью |
 | integration-test-writer | DONE | BLOCKED | Вернуть к architect или developer |
@@ -41,6 +42,7 @@ version: 1.1.0
 - Любой агент не возвращает статус после выполнения (применить retry_policy)
 - Этап не вернул статус 3 раза подряд (retry_policy исчерпан)
 - developer вернул IMPL_BLOCKED третий раз подряд в одном TDD-цикле
+- ARCH_REVISION от developer — немедленно остановить TDD-цикл, делегировать architect
 </escalation_triggers>
 
 <status_definitions>
@@ -58,4 +60,6 @@ IMPL_BLOCKED  — developer не может реализовать метод т
                 без нарушения контрактов; содержит описание противоречия
 TESTS_REVISED — unit-test-writer скорректировал тесты после разбора IMPL_BLOCKED
 TESTS_UPHELD  — unit-test-writer отклонил аргумент developer-а; тесты остаются без изменений
+ARCH_REVISION — developer обнаружил архитектурную проблему, требующую пересмотра
+                architecture.md; прилагается: subtask, problem, affected_contracts
 </status_definitions>
