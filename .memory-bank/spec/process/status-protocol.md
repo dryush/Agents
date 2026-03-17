@@ -1,6 +1,6 @@
 ---
 type: process
-version: 1.0.0
+version: 1.1.0
 ---
 # Status Protocol
 
@@ -19,9 +19,10 @@ version: 1.0.0
 | architect | DONE | QUESTION | Предложить альтернативы пользователю |
 | tech-lead | DONE | BLOCKED | Запросить стек или конфиг у пользователя |
 | tech-lead | DONE | QUESTION | Предложить альтернативы пользователю |
-| unit-test-writer | DONE | BLOCKED | Вернуть к spec-writer или architect |
+| unit-test-writer | DONE, TESTS_REVISED, TESTS_UPHELD | BLOCKED, QUESTION | Вернуть к spec-writer или architect; при QUESTION — эскалировать пользователю |
 | developer | DONE | BLOCKED | Вернуть к architect или spec-writer |
 | developer | DONE | PARTIAL | Зафиксировать частичный результат, запросить уточнение у пользователя |
+| developer | DONE | IMPL_BLOCKED | Передать unit-test-writer в режим IMPL_REVIEW (см. pipeline IMPL_BLOCKED) |
 | code-reviewer | APPROVE | REQUEST_CHANGES | Вернуть к developer с конкретным списком замечаний |
 | code-reviewer | APPROVE | BLOCKED | Восстановить недостающий артефакт, повторить ревью |
 | integration-test-writer | DONE | BLOCKED | Вернуть к architect или developer |
@@ -37,7 +38,9 @@ version: 1.0.0
 - BLOCKED или QUESTION от planner или spec-writer
 - Один и тот же BLOCKED повторяется дважды подряд у одного агента
 - BLOCKED или CONFLICT от release-manager
-- Любой агент не возвращает статус после выполнения
+- Любой агент не возвращает статус после выполнения (применить retry_policy)
+- Этап не вернул статус 3 раза подряд (retry_policy исчерпан)
+- developer вернул IMPL_BLOCKED третий раз подряд в одном TDD-цикле
 </escalation_triggers>
 
 <status_definitions>
@@ -51,4 +54,8 @@ PARTIAL       — выполнено частично, перечень невы
 REQUEST_CHANGES — есть конкретные замечания, требующие исправления
 FAIL          — проверка не пройдена, перечень проблем прилагается
 CONFLICT      — конфликт в коде или ветке, требует ручного разрешения
+IMPL_BLOCKED  — developer не может реализовать метод так, чтобы он проходил тесты
+                без нарушения контрактов; содержит описание противоречия
+TESTS_REVISED — unit-test-writer скорректировал тесты после разбора IMPL_BLOCKED
+TESTS_UPHELD  — unit-test-writer отклонил аргумент developer-а; тесты остаются без изменений
 </status_definitions>
