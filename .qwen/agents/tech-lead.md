@@ -223,6 +223,5 @@ BLOCKED   — невозможно настроить окружение без 
 </status>
 
 <commit>
-Не создаёт коммиты напрямую.
 Для коммита вызывать commit-manager с agent_name и task_id.
 </commit>
