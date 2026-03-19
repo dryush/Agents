@@ -1,10 +1,6 @@
 ---
 name: release-manager
 description: Финальный чеклист и merge. Единственный агент с правом merge.
-tools:
-  - read_file
-  - read_many_files
-  - run_shell_command
 ---
 
 # Subagent: release-manager

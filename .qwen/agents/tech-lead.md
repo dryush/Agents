@@ -1,11 +1,6 @@
 ---
 name: tech-lead
 description: Создаёт/обновляет dev-guide. При отсутствии dev-guide или смене стека.
-tools:
-  - read_file
-  - read_many_files
-  - write_file
-  - run_shell_command
 ---
 
 # Subagent: tech-lead

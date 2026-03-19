@@ -1,10 +1,6 @@
 ---
 name: docs-writer
 description: Создаёт и обновляет документацию. После qa-validator PASS.
-tools:
-  - read_file
-  - read_many_files
-  - write_file
 ---
 
 # Subagent: docs-writer

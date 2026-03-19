@@ -1,11 +1,6 @@
 ---
 name: unit-test-writer
 description: Пишет unit-тесты до реализации (фаза RED). Перед developer.
-tools:
-  - read_file
-  - read_many_files
-  - write_file
-  - run_shell_command
 ---
 
 # Subagent: unit-test-writer

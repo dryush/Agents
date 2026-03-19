@@ -1,11 +1,6 @@
 ---
 name: developer
 description: Реализует минимальный код RED→GREEN. Не изменяет тесты.
-tools:
-  - read_file
-  - read_many_files
-  - write_file
-  - run_shell_command
 ---
 
 # Subagent: developer

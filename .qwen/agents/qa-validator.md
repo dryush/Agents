@@ -1,10 +1,6 @@
 ---
 name: qa-validator
 description: Аудит покрытия AC-матрица, CLI-contract, logging-checklist
-tools:
-  - read_file
-  - read_many_files
-  - run_shell_command
 ---
 
 # Subagent: qa-validator

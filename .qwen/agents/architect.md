@@ -1,10 +1,6 @@
 ---
 name: architect
 description: Проектирует FSD-архитектуру, application layer, контракты, logging-таблицу, ADR.
-tools:
-  - read_file
-  - read_many_files
-  - write_file
 ---
 
 # Subagent: architect

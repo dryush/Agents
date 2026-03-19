@@ -1,9 +1,6 @@
 ---
 name: spec-writer
 description: Формирует acceptance criteria + CLI Contract для каждого use-case.
-tools:
-  - read_file
-  - read_many_files
 ---
 
 # Subagent: spec-writer

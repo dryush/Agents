@@ -1,10 +1,6 @@
 ---
 name: code-reviewer
 description: Проверяет реализацию guardrails, application layer чистоту, logging, типизацию.
-tools:
-  - read_file
-  - read_many_files
-  - run_shell_command
 ---
 
 # Subagent: code-reviewer

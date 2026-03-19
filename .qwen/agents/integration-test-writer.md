@@ -1,11 +1,6 @@
 ---
 name: integration-test-writer
 description: Пишет интеграционные и e2e тесты. После первого APPROVE.
-tools:
-  - read_file
-  - read_many_files
-  - write_file
-  - run_shell_command
 ---
 
 # Subagent: integration-test-writer

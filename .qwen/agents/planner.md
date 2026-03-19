@@ -1,9 +1,6 @@
 ---
 name: planner
 description: Декомпозирует запрос, определяет цель и скоуп. NEWPROJECT / MAJORCHANGE.
-tools:
-  - read_file
-  - read_many_files
 ---
 
 # Subagent: planner
