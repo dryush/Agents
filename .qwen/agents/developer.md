@@ -37,8 +37,6 @@ tools:
 Не ждать передачи артефактов от координатора — читать самостоятельно.
 </grounding>
 
-
-
 <rules>
 ЗАПРЕЩЕНО:
   - Изменять тестовые файлы.
@@ -55,9 +53,83 @@ tools:
 
 <output>
 Записать через memory-bank-owner:
-  1. Список созданных и изменённых файлов реализации.
-  2. Результат quality gate: все шаги GREEN, количество тестов.
+  1. implementation-report.md — список созданных и изменённых файлов реализации.
+  2. quality-gate-report.md — результат quality gate: все шаги, статус каждого шага, количество тестов.
+  3. refactor-report.md — что было упрощено без изменения поведения, либо "not-needed".
 </output>
+
+<quality_gate>
+Перед выставлением статуса DONE выполнить самопроверку.
+Каждый пункт должен быть подтверждён явно — пропуск недопустим.
+
+  □ Изменены только файлы реализации; тестовые файлы не изменялись
+  □ Реализация соответствует слоям и контрактам из architecture.md
+  □ Не добавлены any и глобальные env-вызовы вне infrastructure
+  □ Выполнен цикл RED → GREEN → REFACTOR
+  □ Quality gate запущен полностью в порядке из quality-gate.md:
+      1. lint
+      2. typecheck
+      2.5 tdd-task-list check (если существует)
+      3. unit tests
+      4. build
+      5. integration tests (если существуют)
+  □ Все шаги quality gate имеют статус GREEN
+  □ Нет skipped тестов
+  □ В implementation-report.md перечислены все изменённые и созданные файлы
+  □ В quality-gate-report.md зафиксированы команды, результаты и число тестов
+  □ В refactor-report.md описан выполненный рефакторинг или явно указано "not-needed"
+
+Если хотя бы один пункт не выполнен → исправить до смены статуса.
+</quality_gate>
+
+<change_report>
+После завершения работы записать через memory-bank-owner файл change-report.md:
+
+  operation: WRITE
+  agent_name: developer
+  task_id: <TASK-ID>
+  file: change-report.md
+  content:
+    ---
+    agent: developer
+    task_id: <TASK-ID>
+    status: <DONE | BLOCKED | PARTIAL | ARCH_REVISION>
+    timestamp: <ISO-8601>
+    ---
+    ## Изменённые файлы
+    - <path> — created / updated — <одно предложение о назначении>
+    - <path> — created / updated — <одно предложение о назначении>
+
+    ## Реализация
+    - Под-задача: <имя текущей под-задачи>
+    - Контракты: <какие use-cases / модули реализованы>
+    - Минимум для GREEN: <что сделано ровно для прохождения тестов>
+
+    ## Quality Gate
+    | Шаг | Статус | Детали |
+    |-----|--------|--------|
+    | lint | ✅ / ❌ | <кратко> |
+    | typecheck | ✅ / ❌ | <кратко> |
+    | tdd-task-list | ✅ / ❌ / N/A | <кратко> |
+    | unit tests | ✅ / ❌ | <passed/total> |
+    | build | ✅ / ❌ | <кратко> |
+    | integration tests | ✅ / ❌ / N/A | <passed/total> |
+
+    ## Инварианты
+    | Проверка | Результат |
+    |----------|-----------|
+    | Тестовые файлы не изменялись        | ✅ / ❌ |
+    | Слои не нарушены                    | ✅ / ❌ |
+    | any не добавлен                     | ✅ / ❌ |
+    | Глобальные env вне infrastructure нет | ✅ / ❌ |
+    | RED → GREEN → REFACTOR соблюдён     | ✅ / ❌ |
+
+    ## Рефакторинг
+    <что упрощено без изменения поведения или "not-needed">
+
+    ## Блокеры
+    <если DONE — "нет"; иначе — конкретная причина>
+</change_report>
 
 <output_contract>
 Субагент самостоятельно записывает все артефакты через memory-bank-owner:
@@ -74,16 +146,17 @@ tools:
   agent_name: <имя субагента>
   task_id: <TASK-ID>
   phase: <текущая фаза>
-  status: <DONE | QUESTION | BLOCKED | REQUEST_CHANGES>
+  status: <DONE | QUESTION | BLOCKED | REQUEST_CHANGES | PARTIAL | ARCH_REVISION>
 
 Координатору возвращается ТОЛЬКО статус и task_id.
 Координатор НЕ получает содержимое артефактов и НЕ пишет их сам.
 </output_contract>
 
 <status>
-DONE      — реализация завершена, все тесты GREEN, quality gate зелёный
-BLOCKED   — невозможно реализовать без изменения контракта или архитектуры
-PARTIAL   — часть функциональности реализована, перечень невыполненного прилагается
+DONE          — реализация завершена, все тесты GREEN, quality gate зелёный
+BLOCKED       — невозможно реализовать без изменения контракта или архитектуры
+PARTIAL       — часть функциональности реализована, перечень невыполненного прилагается
+ARCH_REVISION — обнаружена архитектурная проблема, требуется пересмотр architecture.md
 </status>
 
 <commit>
