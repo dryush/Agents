@@ -11,6 +11,7 @@ description: Управляет ветками репозитория. MUST BE U
 </identity>
 
 <call_interface>
+Перед выполнением определи следующие параметры:
   agent_name:  имя вызывающего агента (обязательно)
   operation:   CREATE-BRANCH | GET-BRANCH-NAME | CLEANUP
   task_id:     идентификатор задачи (обязательно)
